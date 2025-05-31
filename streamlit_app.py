@@ -1,42 +1,79 @@
 import streamlit as st
 from datetime import datetime
+import pandas as pd
+import os
 import time
 
-# 设置页面标题
-st.set_page_config(page_title="极简聊天室", page_icon="💬")
+# 共享聊天记录文件名
+CHAT_FILE = "chat_history.csv"
 
-# 全局存储聊天记录（所有用户共享）
-if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+# 设置页面标题和图标
+st.set_page_config(page_title="实时聊天室", page_icon="💬")
 
-# 用户设置
-if "user_name" not in st.session_state:
-    st.session_state.user_name = st.text_input("请输入你的名字", key="username_input")
-    if st.session_state.user_name:
-        st.success(f"欢迎, {st.session_state.user_name}!")
-    st.stop()  # 必须设置名字才能继续
+# 初始化聊天记录文件（如果不存在）
+if not os.path.exists(CHAT_FILE):
+    pd.DataFrame(columns=['timestamp', 'user', 'message']).to_csv(CHAT_FILE, index=False)
 
-# 显示所有聊天记录
-for msg in st.session_state.chat_history:
-    with st.chat_message(name=msg["user"]):
-        st.write(f"**{msg['user']}** ({msg['time']}): {msg['text']}")
+# 加载聊天记录
+def load_messages():
+    return pd.read_csv(CHAT_FILE)
+
+# 保存新消息到聊天记录
+def save_message(user, message):
+    new_message = pd.DataFrame([{
+        'timestamp': datetime.now().strftime("%H:%M:%S"),
+        'user': user,
+        'message': message
+    }])
+    new_message.to_csv(CHAT_FILE, mode='a', index=False, header=False)
+
+# 清空聊天记录
+def clear_messages():
+    pd.DataFrame(columns=['timestamp', 'user', 'message']).to_csv(CHAT_FILE, index=False)
+
+# 侧边栏 - 用户设置
+with st.sidebar:
+    st.title("聊天室设置")
+
+    # 用户名输入
+    if 'user_name' not in st.session_state:
+        st.session_state.user_name = ""
+
+    new_name = st.text_input("你的名字", value=st.session_state.user_name)
+    if new_name != st.session_state.user_name:
+        st.session_state.user_name = new_name
+        st.success(f"已设置用户名: {new_name}")
+
+    # 清空聊天记录按钮
+    if st.button("清空聊天记录"):
+        clear_messages()
+        st.success("已清空聊天记录")
+
+# 主页面标题
+st.title("💬 实时聊天室")
+st.caption("支持多人同时聊天 - 使用共享CSV实现同步")
+
+# 显示聊天记录
+messages = load_messages()
+for _, row in messages.iterrows():
+    with st.chat_message(name=row['user']):
+        st.write(f"**{row['user']}** ({row['timestamp']}): {row['message']}")
 
 # 输入新消息
-if new_msg := st.chat_input("输入消息..."):
-    # 添加到全局聊天记录
-    st.session_state.chat_history.append({
-        "user": st.session_state.user_name,
-        "time": datetime.now().strftime("%H:%M:%S"),
-        "text": new_msg
-    })
-    # 显示新消息
+if prompt := st.chat_input("输入消息..."):
+    if not st.session_state.user_name:
+        st.warning("请先在侧边栏设置你的名字")
+        st.stop()
+
+    # 保存消息
+    save_message(st.session_state.user_name, prompt)
+
+    # 显示自己的消息
     with st.chat_message(name=st.session_state.user_name):
-        st.write(f"**{st.session_state.user_name}** ({datetime.now().strftime('%H:%M:%S')}): {new_msg}")
-    
-    # 自动刷新（模拟"实时"效果）
-    time.sleep(0.1)
+        st.write(f"**{st.session_state.user_name}** ({datetime.now().strftime('%H:%M:%S')}): {prompt}")
+
     st.rerun()
 
-# 每2秒自动刷新（获取新消息）
-time.sleep(2)
+# 每5秒自动刷新页面以获取他人消息
+time.sleep(5)
 st.rerun()
