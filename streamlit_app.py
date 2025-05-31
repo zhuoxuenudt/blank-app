@@ -3,9 +3,16 @@ from datetime import datetime
 import pandas as pd
 import os
 import time
+from twilio.rest import Client
 
 # 共享聊天记录文件名
 CHAT_FILE = "chat_history.csv"
+
+# Twilio配置（请替换为你自己的凭据）
+ACCOUNT_SID = "AC7211eb871a5778aafef053f840006338"  # 替换为你的 ACCOUNT_SID
+AUTH_TOKEN = "aaaf081550bce701b610661da8b5e71f"    # 替换为你的 AUTH_TOKEN
+TWILIO_PHONE = "+123131048310"      # 替换为你的 Twilio 电话号码
+TO_PHONE = "+8615616139621"         # 替换为目标电话号码（带国际区号）
 
 # 设置页面标题和图标
 st.set_page_config(page_title="实时聊天室", page_icon="💬")
@@ -33,6 +40,19 @@ def save_message(user, message):
 def clear_messages():
     pd.DataFrame(columns=['timestamp', 'user', 'message']).to_csv(CHAT_FILE, index=False)
 
+# 发起电话呼叫
+def make_phone_call():
+    try:
+        client = Client(ACCOUNT_SID, AUTH_TOKEN)
+        call = client.calls.create(
+            url="http://demo.twilio.com/docs/voice.xml",
+            to=TO_PHONE,
+            from_=TWILIO_PHONE
+        )
+        st.success(f"呼叫已发起！呼叫SID: {call.sid}")
+    except Exception as e:
+        st.error(f"呼叫失败: {str(e)}")
+
 # 侧边栏 - 用户设置
 with st.sidebar:
     st.title("聊天室设置")
@@ -53,6 +73,14 @@ with st.sidebar:
     if st.button("清空聊天记录"):
         clear_messages()
         st.success("已清空聊天记录")
+    
+    # 分隔线
+    st.divider()
+    
+    # 电话呼叫部分
+    st.title("电话呼叫功能")
+    if st.button("发起电话呼叫", key="call_button"):
+        make_phone_call()
 
 # 主页面标题
 st.title("💬 实时聊天室")
