@@ -9,7 +9,7 @@ from twilio.rest import Client
 CHAT_FILE = "chat_history.csv"
 
 # Twilio配置（请替换为你自己的凭据）
-ACCOUNT_SID = "AC7211eb871a5778aafef053f840006338"  # 替换为你的 ACCOUNT_SID
+ACCOUNT_SID = "USd66bbf7121ea9681d24b70adfd1435c5"  # 替换为你的 ACCOUNT_SID
 AUTH_TOKEN = "aaaf081550bce701b610661da8b5e71f"    # 替换为你的 AUTH_TOKEN
 TWILIO_PHONE = "+13412182075"      # 替换为你的 Twilio 电话号码
 TO_PHONE = "+8615616139621"         # 替换为目标电话号码（带国际区号）
