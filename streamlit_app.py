@@ -20,9 +20,11 @@ def load_messages():
 
 # 保存新消息到聊天记录
 def save_message(user, message):
+    if not user or not message:  # 确保用户名和消息都不为空
+        return
     new_message = pd.DataFrame([{
         'timestamp': datetime.now().strftime("%H:%M:%S"),
-        'user': user,
+        'user': user.strip(),  # 去除前后空格
         'message': message
     }])
     new_message.to_csv(CHAT_FILE, mode='a', index=False, header=False)
@@ -41,8 +43,11 @@ with st.sidebar:
 
     new_name = st.text_input("你的名字", value=st.session_state.user_name)
     if new_name != st.session_state.user_name:
-        st.session_state.user_name = new_name
-        st.success(f"已设置用户名: {new_name}")
+        if new_name.strip():  # 确保用户名不为空
+            st.session_state.user_name = new_name.strip()
+            st.success(f"已设置用户名: {new_name}")
+        else:
+            st.warning("用户名不能为空")
 
     # 清空聊天记录按钮
     if st.button("清空聊天记录"):
@@ -56,12 +61,14 @@ st.caption("支持多人同时聊天 - 使用共享CSV实现同步")
 # 显示聊天记录
 messages = load_messages()
 for _, row in messages.iterrows():
-    with st.chat_message(name=row['user']):
-        st.write(f"**{row['user']}** ({row['timestamp']}): {row['message']}")
+    # 确保用户名不为空
+    if pd.notna(row['user']) and str(row['user']).strip():
+        with st.chat_message(name=str(row['user']).strip()):
+            st.write(f"**{row['user']}** ({row['timestamp']}): {row['message']}")
 
 # 输入新消息
 if prompt := st.chat_input("输入消息..."):
-    if not st.session_state.user_name:
+    if not st.session_state.user_name or not st.session_state.user_name.strip():
         st.warning("请先在侧边栏设置你的名字")
         st.stop()
 
