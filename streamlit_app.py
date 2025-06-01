@@ -44,189 +44,8 @@ def get_random_avatar(seed):
     avatar_type = random.choice(AVATAR_URLS)
     return f"{avatar_type}{seed}"
 
-# 二进制背景动画
-def create_binary_background():
-    st.markdown("""
-    <style>
-    .binary-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        overflow: hidden;
-    }
-    .binary-code {
-        position: absolute;
-        color: rgba(5, 217, 232, 0.1);
-        font-size: 16px;
-        user-select: none;
-        animation: fall linear infinite;
-    }
-    @keyframes fall {
-        to {
-            transform: translateY(100vh);
-        }
-    }
-    </style>
-    <div class="binary-bg" id="binary-bg"></div>
-    <script>
-    function createBinary() {
-        const container = document.getElementById('binary-bg');
-        const binaryChars = '01';
-        const count = 50;
-        
-        for (let i = 0; i < count; i++) {
-            const element = document.createElement('div');
-            element.className = 'binary-code';
-            element.textContent = Array(10).fill(0).map(() => 
-                binaryChars.charAt(Math.floor(Math.random() * binaryChars.length))).join('');
-            
-            element.style.left = Math.random() * 100 + 'vw';
-            element.style.animationDuration = (5 + Math.random() * 10) + 's';
-            element.style.animationDelay = (Math.random() * 5) + 's';
-            element.style.opacity = Math.random();
-            
-            container.appendChild(element);
-        }
-    }
-    
-    createBinary();
-    </script>
-    """, unsafe_allow_html=True)
-
-# 检查密码
-def check_password():
-    """返回是否通过密码验证"""
-    if 'password_correct' not in st.session_state:
-        st.session_state.password_correct = False
-    
-    if st.session_state.password_correct:
-        return True
-    
-    # 创建二进制背景动画
-    create_binary_background()
-    
-    # 使用容器创建布局
-    with st.container():
-        st.markdown("""
-        <style>
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 15px #ff2a6d, 0 0 30px #05d9e8; }
-            50% { box-shadow: 0 0 25px #ff2a6d, 0 0 50px #05d9e8; }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-        .password-container {
-            border: 2px solid #ff2a6d;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 15px #ff2a6d, 0 0 30px #05d9e8;
-            animation: pulse 2s infinite;
-            margin: 40px 0;
-        }
-        .shake {
-            animation: shake 0.5s;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        # 主标题
-        st.markdown("""
-        <div style="text-align: center; margin-bottom: 50px;">
-            <h1 style="color: #ff2a6d; text-shadow: 0 0 20px #ff2a6d; font-size: 72px; margin-bottom: 10px;">2119</h1>
-            <p style="color: #05d9e8; font-size: 24px; text-shadow: 0 0 10px #05d9e8;">NEURAL INTERFACE TERMINAL</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # 密码输入区域
-        with st.markdown('<div class="password-container">', unsafe_allow_html=True):
-            st.markdown('<p style="color: #05d9e8; font-size: 18px; margin-bottom: 20px; text-align: center;">ENTER ACCESS CODE</p>', unsafe_allow_html=True)
-            password = st.text_input("Password", type="password", label_visibility="collapsed", 
-                                    placeholder="ENTER YOUR ACCESS CODE HERE", key="password_input")
-        
-        # 认证按钮
-        col1, col2, col3 = st.columns([1,2,1])
-        with col2:
-            auth_button = st.button("A U T H E N T I C A T E", use_container_width=True,
-                                  help="Verify your identity to access the system", key="auth_button")
-        
-        if auth_button:
-            if password == CORRECT_PASSWORD:
-                st.session_state.password_correct = True
-                st.success("ACCESS GRANTED. INITIALIZING NEURAL INTERFACE...")
-                time.sleep(1)
-                st.rerun()
-            else:
-                st.error("UNAUTHORIZED ACCESS DETECTED. SYSTEM LOCKDOWN INITIATED.")
-                st.markdown("<script>document.querySelector('.password-container').classList.add('shake');</script>", unsafe_allow_html=True)
-    
-    return False
-
-# 初始化聊天记录文件（如果不存在）
-if not os.path.exists(CHAT_FILE):
-    pd.DataFrame(columns=['timestamp', 'user', 'message', 'avatar']).to_csv(CHAT_FILE, index=False)
-
-# 加载聊天记录
-def load_messages():
-    return pd.read_csv(CHAT_FILE)
-
-# 保存新消息到聊天记录
-def save_message(user, message):
-    if not user or not message:  # 确保用户名和消息都不为空
-        return
-    
-    # 获取或生成用户头像
-    if 'avatar_url' not in st.session_state or not st.session_state.avatar_url:
-        st.session_state.avatar_url = get_random_avatar(user)
-    
-    new_message = pd.DataFrame([{
-        'timestamp': datetime.now().strftime("%H:%M:%S"),
-        'user': user.strip(),  # 去除前后空格
-        'message': message,
-        'avatar': st.session_state.avatar_url
-    }])
-    new_message.to_csv(CHAT_FILE, mode='a', index=False, header=False)
-
-# 清空聊天记录
-def clear_messages():
-    pd.DataFrame(columns=['timestamp', 'user', 'message', 'avatar']).to_csv(CHAT_FILE, index=False)
-
-# 发起电话呼叫
-def make_phone_call():
-    try:
-        client = Client(ACCOUNT_SID, AUTH_TOKEN)
-        call = client.calls.create(
-            url="http://demo.twilio.com/docs/voice.xml",
-            to=TO_PHONE,
-            from_=TWILIO_PHONE
-        )
-        st.success(f"NEURAL CALL INITIATED! CALL SID: {call.sid}")
-    except Exception as e:
-        st.error(f"CALL FAILED: {str(e)}")
-
-# 发送Server酱消息
-def send_serverchan_message(title, message):
-    data = {
-        "title": title,
-        "desp": message,
-        "channel": 9
-    }
-    
-    try:
-        response = requests.post(SERVER_CHAN_URL, data=data)
-        response.raise_for_status()
-        return True, response.json()
-    except requests.exceptions.RequestException as e:
-        return False, str(e)
-
-# 主应用
-def main_app():
-    # 设置赛博朋克样式
+# 应用赛博朋克CSS样式
+def set_cyberpunk_style():
     st.markdown("""
     <style>
     :root {
@@ -448,6 +267,228 @@ def main_app():
     }
     </style>
     """, unsafe_allow_html=True)
+
+# 创建二进制背景动画
+def create_binary_background():
+    st.markdown("""
+    <div class="binary-bg" id="binary-bg"></div>
+    <script>
+    function createBinary() {
+        const container = document.getElementById('binary-bg');
+        const binaryChars = '01';
+        const count = 50;
+        
+        for (let i = 0; i < count; i++) {
+            const element = document.createElement('div');
+            element.className = 'binary-code';
+            element.textContent = Array(10).fill(0).map(() => 
+                binaryChars.charAt(Math.floor(Math.random() * binaryChars.length))).join('');
+            
+            element.style.left = Math.random() * 100 + 'vw';
+            element.style.animationDuration = (5 + Math.random() * 10) + 's';
+            element.style.animationDelay = (Math.random() * 5) + 's';
+            element.style.opacity = Math.random();
+            
+            container.appendChild(element);
+        }
+    }
+    
+    createBinary();
+    </script>
+    """, unsafe_allow_html=True)
+
+# 检查密码
+def check_password():
+    """返回是否通过密码验证"""
+    if 'password_correct' not in st.session_state:
+        st.session_state.password_correct = False
+    
+    if st.session_state.password_correct:
+        return True
+    
+    # 创建二进制背景动画
+    create_binary_background()
+    
+    # 赛博朋克风格的登录界面
+    st.markdown("""
+    <div class="login-container">
+        <div class="login-box">
+            <h1 style="color: #ff2a6d; text-shadow: 0 0 10px #ff2a6d, 0 0 20px #ff2a6d;">WELCOME TO 2119</h1>
+            <p style="color: #05d9e8; font-size: 1.2em; margin-bottom: 30px;">NEURAL INTERFACE TERMINAL</p>
+            
+            <div style="margin: 30px 0;">
+                <div class="terminal password-input" style="margin-bottom: 20px;">
+                    <div id="password-input-container"></div>
+                </div>
+                
+                <div id="avatar-container" style="display: none;">
+                    <div class="avatar-container">
+                        <img id="user-avatar" class="avatar-img" src="" alt="Avatar">
+                    </div>
+                    <div id="username-display" style="color: #05d9e8; margin-bottom: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 密码输入表单
+    with st.form("密码验证"):
+        # 使用空的st.empty()作为密码输入容器
+        password_container = st.empty()
+        password = password_container.text_input(" ", type="password", key="password_input", 
+                                              label_visibility="collapsed")
+        
+        submitted = st.form_submit_button("AUTHENTICATE", use_container_width=True)
+        
+        if submitted:
+            if password == CORRECT_PASSWORD:
+                st.session_state.password_correct = True
+                st.success("ACCESS GRANTED. INITIALIZING NEURAL INTERFACE...")
+                time.sleep(1)  # 给用户看到成功消息
+                st.rerun()
+            else:
+                st.error("UNAUTHORIZED ACCESS DETECTED. SYSTEM LOCKDOWN INITIATED.")
+    
+    # 如果用户名已设置，显示头像
+    if 'user_name' in st.session_state and st.session_state.user_name:
+        avatar_url = get_random_avatar(st.session_state.user_name)
+        st.markdown(f"""
+        <script>
+        document.getElementById('avatar-container').style.display = 'block';
+        document.getElementById('user-avatar').src = '{avatar_url}';
+        document.getElementById('username-display').innerText = 'USER: {st.session_state.user_name}';
+        </script>
+        """, unsafe_allow_html=True)
+    
+    return False
+
+# 初始化聊天记录文件（如果不存在）
+if not os.path.exists(CHAT_FILE):
+    pd.DataFrame(columns=['timestamp', 'user', 'message', 'avatar']).to_csv(CHAT_FILE, index=False)
+
+# 加载聊天记录
+def load_messages():
+    return pd.read_csv(CHAT_FILE)
+
+# 保存新消息到聊天记录
+def save_message(user, message):
+    if not user or not message:  # 确保用户名和消息都不为空
+        return
+    
+    # 获取或生成用户头像
+    if 'avatar_url' not in st.session_state or not st.session_state.avatar_url:
+        st.session_state.avatar_url = get_random_avatar(user)
+    
+    new_message = pd.DataFrame([{
+        'timestamp': datetime.now().strftime("%H:%M:%S"),
+        'user': user.strip(),  # 去除前后空格
+        'message': message,
+        'avatar': st.session_state.avatar_url
+    }])
+    new_message.to_csv(CHAT_FILE, mode='a', index=False, header=False)
+
+# 清空聊天记录
+def clear_messages():
+    pd.DataFrame(columns=['timestamp', 'user', 'message', 'avatar']).to_csv(CHAT_FILE, index=False)
+
+# 发起电话呼叫
+def make_phone_call():
+    try:
+        client = Client(ACCOUNT_SID, AUTH_TOKEN)
+        call = client.calls.create(
+            url="http://demo.twilio.com/docs/voice.xml",
+            to=TO_PHONE,
+            from_=TWILIO_PHONE
+        )
+        st.success(f"NEURAL CALL INITIATED! CALL SID: {call.sid}")
+    except Exception as e:
+        st.error(f"CALL FAILED: {str(e)}")
+
+# 发送Server酱消息
+def send_serverchan_message(title, message):
+    data = {
+        "title": title,
+        "desp": message,
+        "channel": 9
+    }
+    
+    try:
+        response = requests.post(SERVER_CHAN_URL, data=data)
+        response.raise_for_status()
+        return True, response.json()
+    except requests.exceptions.RequestException as e:
+        return False, str(e)
+
+# 主应用
+def main_app():
+    # 设置赛博朋克样式
+    set_cyberpunk_style()
+    
+    # 侧边栏 - 用户设置
+    with st.sidebar:
+        st.markdown("""
+        <div style="border-bottom: 1px solid #ff2a6d; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="color: #05d9e8;">SYSTEM CONTROL PANEL</h2>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 用户名输入
+        if 'user_name' not in st.session_state:
+            st.session_state.user_name = ""
+            st.session_state.avatar_url = ""
+
+        new_name = st.text_input("USER IDENTITY", value=st.session_state.user_name)
+        if new_name != st.session_state.user_name:
+            if new_name.strip():
+                st.session_state.user_name = new_name.strip()
+                st.session_state.avatar_url = get_random_avatar(new_name.strip())
+                st.success(f"IDENTITY CONFIRMED: {new_name}")
+                
+                # 显示用户头像
+                st.markdown(f"""
+                <div style="text-align: center; margin: 20px 0;">
+                    <div class="avatar-container">
+                        <img src="{st.session_state.avatar_url}" class="avatar-img" alt="User Avatar">
+                    </div>
+                    <div style="color: #05d9e8; margin-top: 10px;">USER: {new_name.strip()}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.warning("IDENTITY REQUIRED FOR NEURAL UPLINK")
+
+        # 清空聊天记录按钮
+        if st.button("PURGE MEMORY BANKS", key="clear_chat"):
+            clear_messages()
+            st.success("MEMORY PURGE COMPLETE")
+        
+        st.markdown("""
+        <div style="border-top: 1px solid #ff2a6d; margin: 20px 0; padding-top: 10px;">
+            <h3 style="color: #05d9e8;">COMMUNICATION MODULES</h3>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 电话呼叫部分
+        if st.button("INITIATE NEURAL CALL", key="call_button"):
+            make_phone_call()
+        
+        # Server酱消息发送部分
+        with st.form("serverchan_form"):
+            st.markdown("<h4 style='color: #ff2a6d;'>NEURAL MESSAGE TRANSMITTER</h4>", unsafe_allow_html=True)
+            title = st.text_input("MESSAGE HEADER", value="SYSTEM ALERT")
+            message = st.text_area("MESSAGE CONTENT")
+            submitted = st.form_submit_button("TRANSMIT")
+            
+            if submitted:
+                if not message:
+                    st.warning("MESSAGE CONTENT REQUIRED")
+                else:
+                    success, result = send_serverchan_message(title, message)
+                    if success:
+                        st.success("MESSAGE TRANSMISSION SUCCESSFUL")
+                        st.json(result)
+                    else:
+                        st.error(f"TRANSMISSION FAILED: {result}")
 
     # 主页面标题
     st.markdown("""
