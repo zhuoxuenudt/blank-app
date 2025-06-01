@@ -10,7 +10,7 @@ import requests
 CHAT_FILE = "chat_history.csv"
 
 # 密码配置
-CORRECT_PASSWORD = "123456"  # 设置你的密码
+CORRECT_PASSWORD = "hello world"  # 设置你的密码
 
 # Twilio配置（请替换为你自己的凭据）
 ACCOUNT_SID = "AC6d70171e378d8da26ee5521c78214382"
@@ -32,20 +32,20 @@ def check_password():
     
     if st.session_state.password_correct:
         return True
-    
+    st.subheader("WELCOME TO 2119 MAGIC WORLD!")  # 更小的标题
     # 密码输入表单
     with st.form("密码验证"):
-        password = st.text_input("请输入密码", type="password")
+        password = st.text_input("Please input your password!", type="password")
         submitted = st.form_submit_button("提交")
         
         if submitted:
             if password == CORRECT_PASSWORD:
                 st.session_state.password_correct = True
-                st.success("密码正确！正在加载聊天室...")
+                st.success("Password! Correct! Entering the magical world...")
                 time.sleep(1)  # 给用户看到成功消息
                 st.rerun()
             else:
-                st.error("密码错误，请重试")
+                st.error("Wrong password, Magic World is about to self-destruct")
     
     return False
 
