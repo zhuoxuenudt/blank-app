@@ -9,12 +9,6 @@ import requests
 # 页面配置
 st.set_page_config(page_title="实时聊天室", page_icon="💬")
 
-# 检查登录状态
-if 'password_correct' not in st.session_state or not st.session_state.password_correct:
-    st.warning("请先登录")
-    time.sleep(1)
-    st.switch_page("login.py")
-    st.stop()
 
 # ========== 以下是聊天室功能 ==========
 
