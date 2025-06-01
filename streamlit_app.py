@@ -160,147 +160,67 @@ def check_password():
     # 创建二进制背景动画
     create_binary_background()
     
-    # 赛博朋克风格的登录界面 - 增强版
-    st.markdown("""
-    <div class="login-container">
-        <div class="login-box">
-            <h1 style="color: #ff2a6d; text-shadow: 0 0 20px #ff2a6d, 0 0 40px #ff2a6d; font-size: 5rem; margin-bottom: 0.5rem;">2119</h1>
-            <p style="color: #05d9e8; font-size: 2rem; margin-bottom: 2rem; text-shadow: 0 0 10px #05d9e8;">NEURAL INTERFACE TERMINAL</p>
-            
-            <!-- 动态扫描线效果 -->
-            <div style="position: relative; height: 2px; width: 100%; margin: 2rem 0; overflow: hidden;">
-                <div style="position: absolute; height: 100%; width: 100%; background: linear-gradient(90deg, transparent, #ff2a6d, transparent); animation: scan 2s linear infinite;"></div>
-            </div>
-            
-            <!-- 创意密码输入框 -->
-            <div style="position: relative; margin: 3rem 0;">
-                <div class="terminal password-input" style="height: 80px; display: flex; align-items: center; justify-content: center;">
-                    <div id="password-dots" style="letter-spacing: 1rem; font-size: 2rem; color: #05d9e8;"></div>
-                    <input type="password" id="hidden-password-input" style="opacity: 0; position: absolute; width: 0; height: 0;">
+    # 使用columns创建布局
+    col1, col2, col3 = st.columns([1, 6, 1])
+    
+    with col2:
+        # 赛博朋克风格的登录界面
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h1 style="color: #ff2a6d; text-shadow: 0 0 20px #ff2a6d; font-size: 72px; margin-bottom: 10px;">2119</h1>
+            <p style="color: #05d9e8; font-size: 24px; text-shadow: 0 0 10px #05d9e8;">NEURAL INTERFACE TERMINAL</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 密码输入区域
+        st.markdown("""
+        <div style="position: relative; margin: 40px 0;">
+            <div style="border: 2px solid #ff2a6d; padding: 30px; border-radius: 5px; 
+                        box-shadow: 0 0 15px #ff2a6d, 0 0 30px #05d9e8;
+                        animation: pulse 2s infinite;">
+                <div style="text-align: center;">
+                    <p style="color: #05d9e8; font-size: 18px; margin-bottom: 20px;">ENTER ACCESS CODE</p>
                 </div>
-                <div style="color: #05d9e8; margin-top: 1rem; font-size: 1.2rem; text-align: center;">
-                    <span id="password-status">ENTER ACCESS CODE</span>
-                </div>
-            </div>
-            
-            <!-- 认证按钮 -->
-            <div style="position: relative;">
-                <button id="auth-button" style="background: transparent; border: 2px solid #05d9e8; color: #05d9e8; padding: 1rem 3rem; font-size: 1.5rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5rem; position: relative; overflow: hidden; transition: all 0.3s;">
-                    <span style="position: relative; z-index: 2;">AUTHENTICATE</span>
-                    <span style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(5, 217, 232, 0.5), transparent); transition: all 0.6s;"></span>
-                </button>
             </div>
         </div>
-    </div>
-    
-    <style>
-    @keyframes scan {
-        0% { left: -100%; }
-        100% { left: 100%; }
-    }
-    
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 0 10px #ff2a6d, 0 0 20px #05d9e8; }
-        50% { box-shadow: 0 0 20px #ff2a6d, 0 0 40px #05d9e8; }
-    }
-    
-    .password-input {
-        animation: pulse 2s infinite;
-        position: relative;
-    }
-    
-    #auth-button:hover {
-        background: rgba(5, 217, 232, 0.1) !important;
-        box-shadow: 0 0 15px #05d9e8;
-    }
-    
-    #auth-button:hover span:last-child {
-        left: 100%;
-    }
-    
-    /* 密码点动画 */
-    @keyframes dot-appear {
-        0% { opacity: 0; transform: scale(0.5); }
-        100% { opacity: 1; transform: scale(1); }
-    }
-    
-    .password-dot {
-        display: inline-block;
-        animation: dot-appear 0.3s ease-out;
-    }
-    </style>
-    
-    <script>
-    // 密码输入处理
-    const passwordDots = document.getElementById('password-dots');
-    const hiddenInput = document.getElementById('hidden-password-input');
-    const passwordStatus = document.getElementById('password-status');
-    let password = '';
-    
-    // 聚焦到隐藏的输入框
-    hiddenInput.focus();
-    
-    // 监听输入
-    hiddenInput.addEventListener('input', (e) => {
-        password = e.target.value;
         
-        // 更新显示的圆点
-        passwordDots.innerHTML = '';
-        for (let i = 0; i < password.length; i++) {
-            const dot = document.createElement('span');
-            dot.className = 'password-dot';
-            dot.innerHTML = '•';
-            passwordDots.appendChild(dot);
+        <style>
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 15px #ff2a6d, 0 0 30px #05d9e8; }
+            50% { box-shadow: 0 0 25px #ff2a6d, 0 0 50px #05d9e8; }
         }
+        </style>
+        """, unsafe_allow_html=True)
         
-        // 更新状态文本
-        if (password.length > 0) {
-            passwordStatus.textContent = 'ACCESS CODE: ' + '*'.repeat(password.length);
-        } else {
-            passwordStatus.textContent = 'ENTER ACCESS CODE';
-        }
-    });
-    
-    // 按钮点击处理
-    document.getElementById('auth-button').addEventListener('click', () => {
-        // 这里将通过Streamlit的通信机制发送密码
-        window.parent.postMessage({
-            type: 'streamlit:setComponentValue',
-            value: password
-        }, '*');
-    });
-    </script>
-    """, unsafe_allow_html=True)
-    
-    # 使用Streamlit的通信机制获取密码
-    password = st.text_input(" ", type="password", key="password_input", 
-                           label_visibility="collapsed")
-    
-    if st.button(" ", key="auth_submit", use_container_width=True):
-        if password == CORRECT_PASSWORD:
-            st.session_state.password_correct = True
-            st.success("ACCESS GRANTED. INITIALIZING NEURAL INTERFACE...")
-            time.sleep(1)
-            st.rerun()
-        else:
-            st.error("UNAUTHORIZED ACCESS DETECTED. SYSTEM LOCKDOWN INITIATED.")
-            # 添加震动效果
-            st.markdown("""
-            <script>
-            document.querySelector('.login-box').animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(10px)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(10px)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(0)' }
-            ], {
-                duration: 500,
-                iterations: 1
-            });
-            </script>
-            """, unsafe_allow_html=True)
+        # 使用Streamlit原生输入框但隐藏标签
+        password = st.text_input("Password", type="password", label_visibility="collapsed", 
+                                placeholder="ENTER YOUR ACCESS CODE HERE")
+        
+        # 认证按钮
+        auth_button = st.button("A U T H E N T I C A T E", use_container_width=True,
+                              help="Verify your identity to access the system")
+        
+        if auth_button:
+            if password == CORRECT_PASSWORD:
+                st.session_state.password_correct = True
+                st.success("ACCESS GRANTED. INITIALIZING NEURAL INTERFACE...")
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.error("UNAUTHORIZED ACCESS DETECTED. SYSTEM LOCKDOWN INITIATED.")
+                # 使用HTML/CSS创建震动效果
+                st.markdown("""
+                <style>
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+                    20%, 40%, 60%, 80% { transform: translateX(10px); }
+                }
+                .stButton>button {
+                    animation: shake 0.5s;
+                }
+                </style>
+                """, unsafe_allow_html=True)
     
     return False
 
