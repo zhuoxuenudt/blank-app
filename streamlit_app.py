@@ -14,13 +14,8 @@ import base64
 CHAT_FILE = "chat_history.csv"
 
 # 密码配置
-CORRECT_PASSWORD = "hello 2119 world"  # 设置你的密码
+CORRECT_PASSWORD = "hello world"  # 设置你的密码
 
-# Twilio配置（请替换为你自己的凭据）
-ACCOUNT_SID = "AC6d70171e378d8da26ee5521c78214382"
-AUTH_TOKEN = "39af64209304f3a8b82b83b10ca899c4"
-TWILIO_PHONE = "+13412182075"
-TO_PHONE = "+8615616139621"
 
 # Server酱配置
 SERVER_CHAN_URL = "https://sctapi.ftqq.com/SCT31129TtqguxCLA1OYNhAf1mtxxmyz3.send"
@@ -34,7 +29,7 @@ AVATAR_URLS = [
 
 # 设置页面标题和图标
 st.set_page_config(
-    page_title="MAGIC-CHAT 2119",
+    page_title="MAGIC-CHAT",
     page_icon="💬",
     layout="wide"
 )
@@ -293,13 +288,13 @@ def check_password():
         <div style="font-size: 3em; color: #ff2a6d; text-shadow: 0 0 10px #ff2a6d, 0 0 20px #ff2a6d; margin-bottom: 20px;">
             ✨🔮✨
         </div>
-        <h1 style="color: #ff2a6d; text-shadow: 0 0 10px #ff2a6d, 0 0 20px #ff2a6d;">WELCOME TO HOGWARTS 2119 MAGIC WORLD!</h1>
+        <h1 style="color: #ff2a6d; text-shadow: 0 0 10px #ff2a6d, 0 0 20px #ff2a6d;">WELCOME TO HOGWARTS MAGIC  WORLD!</h1>
         <p style="color: #05d9e8; font-size: 1.2em;">Crucio | Expecto Patronum | Petrificus Totalus | Expelliarmus | Lumos | Sectumsempra | Wingardium Leviosa</p>
     """, unsafe_allow_html=True)
 
     # 密码输入表单
     with st.form("密码验证"):
-        password = st.text_input("ENTER MAGIC CODE: NO MUGGLES ALLOWED", type="password",
+        password = st.text_input("ENTER MAGIC CODE---NO MUGGLES ALLOWED!", type="password",
                                  help="Authorization required for neural uplink")
         submitted = st.form_submit_button("AUTHENTICATE")
 
@@ -388,7 +383,8 @@ def main_app():
     with st.sidebar:
         st.markdown("""
         <div style="border-bottom: 1px solid #ff2a6d; padding-bottom: 10px; margin-bottom: 20px;">
-            <h2 style="color: #05d9e8;text-align: center;">HOGWARTS SCHOOL\r\n2119 MAGIC CLASS</h2>
+            <h2 style="color: #05d9e8;text-align: center;">HOGWARTS SCHOOL</h2>
+            <h2 style="color: #05d9e8;text-align: center;">MAGIC CLASS</h2>
         </div>
         """, unsafe_allow_html=True)
 
@@ -450,8 +446,8 @@ def main_app():
     # 主页面标题
     st.markdown("""
     <div style="display: flex; align-items: center; margin-bottom: 20px;">
-        <h1 style="color: #ff2a6d; margin-right: 15px;">MAGIC-CHAT 2119</h1>
-        <span style="color: #05d9e8; font-size: 0.8em; margin-top: 10px;">ONLY 2119 MAGICIANS ALLOWED</span>
+        <h1 style="color: #ff2a6d; margin-right: 15px;">MAGIC-CHAT</h1>
+        <span style="color: #05d9e8; font-size: 0.8em; margin-top: 10px;">ONLY MAGICIANS ALLOWED</span>
     </div>
     """, unsafe_allow_html=True)
 
